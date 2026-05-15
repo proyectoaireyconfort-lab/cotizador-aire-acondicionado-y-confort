@@ -962,52 +962,94 @@ function renderQuote(){
   renderPrintDoc();
 }
 
+function includesForService(serviceKey){
+  if (["instalacion_basica", "instalacion_materiales", "venta_instalacion"].includes(serviceKey)) {
+    return [
+      "✅ Mano de obra técnica",
+      "✅ Instalación de unidad interior y exterior",
+      "✅ Conexión básica del equipo",
+      "✅ Vacío al sistema",
+      "✅ Prueba de funcionamiento",
+      "✅ Garantía sobre mano de obra"
+    ];
+  }
+  if (serviceKey === "mantenimiento") {
+    return [
+      "✅ Limpieza y lavado del equipo",
+      "✅ Revisión de drenaje",
+      "✅ Revisión general de funcionamiento",
+      "✅ Recomendaciones técnicas"
+    ];
+  }
+  if (serviceKey === "diagnostico") {
+    return [
+      "✅ Revisión técnica del equipo",
+      "✅ Explicación de la falla detectada",
+      "✅ Cotización de reparación si aplica"
+    ];
+  }
+  if (serviceKey === "carga_gas") {
+    return [
+      "✅ Revisión básica de funcionamiento",
+      "✅ Ajuste/carga de refrigerante según necesidad",
+      "✅ Prueba de enfriamiento"
+    ];
+  }
+  if (serviceKey === "busqueda_fuga") {
+    return [
+      "✅ Revisión para localizar posible fuga",
+      "✅ Diagnóstico técnico",
+      "✅ Cotización de reparación si aplica"
+    ];
+  }
+  return [
+    "✅ Mano de obra técnica",
+    "✅ Consumibles estándar del servicio",
+    "✅ Prueba de funcionamiento",
+    "✅ Explicación del trabajo realizado"
+  ];
+}
+
 function generateWhatsAppMessage(){
   const q = App.state.quote || calculate();
   const t = q.tiers[App.state.selectedTier];
   const settings = q.settings;
-  const ivaLine = q.form.includeIva ? `\nIVA incluido: ${money(t.iva)}` : `\nFactura/IVA: en caso de requerir factura, se agrega IVA.`;
-  const materialsLine = q.mat.lines.length ? q.mat.lines.map(l => `• ${l.name}: ${l.qty} ${l.unit}`).join("\n") : "• Sin materiales extra seleccionados";
-  const equipmentLine = q.eq.total > 0 ? `\nEquipo incluido: ${q.eq.qty} × ${q.eq.name}` : "";
-  const client = q.form.clientName || "Cliente";
+  const ivaLine = q.form.includeIva ? `*IVA incluido:* ${money(t.iva)} MXN` : `*Nota:* Precio sin IVA. En caso de requerir factura, se agrega IVA.`;
+  const client = q.form.clientName && q.form.clientName.trim() ? q.form.clientName.trim() : "Por confirmar";
+  const equipmentLine = q.eq.total > 0 ? `\n*Equipo incluido:* ${q.eq.qty} × ${q.eq.name}` : "";
+  const includeLines = includesForService(q.form.service).join("\n");
+  const materialsBlock = q.mat.lines.length
+    ? `\n\n*Extra${q.mat.lines.length > 1 ? "s" : ""} considerado${q.mat.lines.length > 1 ? "s" : ""}:*\n${q.mat.lines.map(l => `• ${l.name}: ${l.qty} ${l.unit}`).join("\n")}`
+    : "";
+
   return `❄️🔥 *${settings.company_name.toUpperCase()}*
 _${settings.slogan}_
 
-*Cotización:* ${q.id}
+*COTIZACIÓN:* ${q.id}
 *Cliente:* ${client}
 *Servicio:* ${q.service.name}
 *Zona:* ${q.zone.name}
 *Equipo:* ${q.form.capacity} / ${q.form.voltage} / ${q.form.equipmentType}
 *Acceso:* ${q.access.label}${equipmentLine}
 
-*Precio:* ${money(t.total)} MXN${ivaLine}
-*Anticipo sugerido:* ${q.deposit > 0 ? money(q.deposit) : "No requerido para este servicio"}
+💰 *Total cotizado:* ${money(t.total)} MXN
+💵 *Anticipo sugerido:* ${q.deposit > 0 ? money(q.deposit) : "No requerido para este servicio"}
+${ivaLine}
 
 *Incluye:*
-✅ Mano de obra técnica
-✅ Consumibles estándar del servicio
-✅ Herramienta y prueba de funcionamiento
-✅ Explicación del trabajo realizado
+${includeLines}${materialsBlock}
 
-*Extras considerados:*
-${materialsLine}
+*Condiciones generales:*
+La garantía aplica sobre el servicio realizado. No cubre fallas propias del equipo, variaciones eléctricas, manipulación de terceros, falta de mantenimiento, material no incluido o cambios posteriores.
 
-*Condiciones:*
-${q.warrantyText}
-
-*No incluye, salvo que esté agregado arriba:*
-❌ Trabajo eléctrico adicional
-❌ Refacciones no mencionadas
-❌ Material extra no seleccionado
-❌ Maniobras especiales no declaradas
-❌ Reparación de fugas si solo se solicita carga de gas
+No incluye trabajos eléctricos, refacciones, material adicional o maniobras especiales si no fueron agregadas en la cotización.
 
 Cotización válida por ${settings.default_validity_days} días.
 Llamadas y WhatsApp: ${settings.phones.join(" | ")}
 
-Atte. César - Aire Acondicionado y Confort`;
+Atte. César
+*${settings.company_name}*`;
 }
-
 function updateAll(save=false){
   calculate();
   renderQuote();
@@ -1020,7 +1062,7 @@ function saveCurrentQuote(){
   const item = {
     id: q.id,
     createdAt: q.createdAt,
-    clientName: q.form.clientName || "Cliente sin nombre",
+    clientName: q.form.clientName || "Cliente por confirmar",
     serviceName: q.service.name,
     zoneName: q.zone.name,
     selectedTier: App.state.selectedTier,
@@ -1097,7 +1139,7 @@ function renderPrintDoc(){
       Vigencia: ${q.settings.default_validity_days} días
     </div>
     <div class="print-box">
-      <strong>Cliente:</strong> ${q.form.clientName || "Cliente"}<br>
+      <strong>Cliente:</strong> ${q.form.clientName || "Cliente por confirmar"}<br>
       <strong>Teléfono:</strong> ${q.form.clientPhone || "No capturado"}<br>
       <strong>Ubicación:</strong> ${q.zone.name}${q.form.address ? " · " + q.form.address : ""}<br>
       <strong>Equipo:</strong> ${q.form.capacity} / ${q.form.voltage} / ${q.form.equipmentType}
