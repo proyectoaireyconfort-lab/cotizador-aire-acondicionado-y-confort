@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Cotizador HVAC Pro | Aire Acondicionado y Confort</title>
-  <!-- Versión de un solo archivo para subir fácil desde celular a GitHub Pages -->
+  <!-- V3: motor de precios realistas para servicios de entrada + un solo archivo para GitHub Pages -->
   <meta name="description" content="Cotizador interno de Aire Acondicionado y Confort para instalaciones, mantenimientos y servicios HVAC.">
 <style>
 
@@ -317,11 +317,11 @@ const INLINE_CONFIG = {
       "name": "Diagnóstico técnico",
       "category": "Diagnóstico",
       "description": "Revisión técnica para detectar falla y cotizar reparación.",
-      "labor": 300,
+      "labor": 200,
       "helper": 0,
-      "consumables": 40,
-      "tool_wear": 70,
-      "risk": 100,
+      "consumables": 20,
+      "tool_wear": 50,
+      "risk": 30,
       "requires_helper": false,
       "warranty_rule": "diagnostico",
       "floors": {
@@ -342,11 +342,11 @@ const INLINE_CONFIG = {
       "name": "Mantenimiento preventivo minisplit",
       "category": "Mantenimiento",
       "description": "Limpieza, lavado, drenaje, revisión general y prueba de funcionamiento.",
-      "labor": 700,
+      "labor": 500,
       "helper": 0,
-      "consumables": 120,
-      "tool_wear": 100,
-      "risk": 150,
+      "consumables": 90,
+      "tool_wear": 80,
+      "risk": 60,
       "requires_helper": false,
       "warranty_rule": "mantenimiento",
       "floors": {
@@ -467,11 +467,11 @@ const INLINE_CONFIG = {
       "name": "Carga/Ajuste de refrigerante",
       "category": "Refrigerante",
       "description": "Carga o ajuste de refrigerante. Si no se repara fuga, no se garantiza duración del gas.",
-      "labor": 500,
+      "labor": 300,
       "helper": 0,
-      "consumables": 120,
-      "tool_wear": 120,
-      "risk": 250,
+      "consumables": 60,
+      "tool_wear": 80,
+      "risk": 60,
       "requires_helper": false,
       "warranty_rule": "gas_sin_fuga",
       "floors": {
@@ -492,11 +492,11 @@ const INLINE_CONFIG = {
       "name": "Búsqueda de fuga",
       "category": "Refrigerante",
       "description": "Revisión dedicada para localizar fuga. Reparación se cotiza aparte si aplica.",
-      "labor": 900,
+      "labor": 600,
       "helper": 0,
-      "consumables": 180,
-      "tool_wear": 220,
-      "risk": 400,
+      "consumables": 100,
+      "tool_wear": 150,
+      "risk": 100,
       "requires_helper": false,
       "warranty_rule": "busqueda_fuga",
       "floors": {
@@ -543,7 +543,7 @@ const INLINE_CONFIG = {
     "vistas_california": {
       "name": "Vistas California Residencial",
       "type": "neighbor",
-      "travel": 80,
+      "travel": 0,
       "distance_note": "Vecino / zona inmediata",
       "travel_time": "5-10 min"
     },
@@ -806,9 +806,27 @@ function calculate(){
   const clientMode = zone.type === "neighbor" ? "neighbor" : "standard";
   const floors = service.floors[clientMode] || service.floors.standard;
 
-  const calcMin = roundMoney(operationalCost / 0.75);
-  const calcRec = roundMoney(operationalCost / 0.60);
-  const calcPrem = roundMoney(operationalCost / 0.45);
+  const menuPricingServices = ["diagnostico", "mantenimiento", "carga_gas", "busqueda_fuga"];
+  const useMenuPricing = menuPricingServices.includes(form.serviceId);
+
+  let calcMin = roundMoney(operationalCost / 0.75);
+  let calcRec = roundMoney(operationalCost / 0.60);
+  let calcPrem = roundMoney(operationalCost / 0.45);
+
+  // V3: Para servicios de entrada se usa tarifa comercial realista
+  // + traslado fuera de Vistas + extras con margen. Esto evita diagnósticos inflados.
+  if(useMenuPricing){
+    const zoneAdjustment = zone.type === "neighbor" ? 0 : (zone.travel || 0);
+    const addOnCost = roundMoney(mat.total + eq.total + access.fixed);
+    calcMin = roundMoney(floors.minimum + zoneAdjustment + (addOnCost / 0.75));
+    calcRec = roundMoney(floors.recommended + zoneAdjustment + (addOnCost / 0.60));
+    calcPrem = roundMoney(floors.premium + zoneAdjustment + (addOnCost / 0.45));
+    if(form.emergency){
+      calcMin = roundMoney(calcMin * 1.20);
+      calcRec = roundMoney(calcRec * 1.20);
+      calcPrem = roundMoney(calcPrem * 1.20);
+    }
+  }
 
   const tiers = {
     minimum: {
