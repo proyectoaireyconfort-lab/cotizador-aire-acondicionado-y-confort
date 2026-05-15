@@ -1,0 +1,1188 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Cotizador HVAC Pro | Aire Acondicionado y Confort</title>
+  <!-- Versión de un solo archivo para subir fácil desde celular a GitHub Pages -->
+  <meta name="description" content="Cotizador interno de Aire Acondicionado y Confort para instalaciones, mantenimientos y servicios HVAC.">
+<style>
+
+:root{
+  --bg:#06111f;--panel:#0b1728;--panel2:#0e1d33;--text:#eaf4ff;--muted:#9fb4cc;
+  --blue:#38bdf8;--blue2:#2563eb;--red:#ef4444;--orange:#f97316;--green:#22c55e;
+  --border:rgba(148,163,184,.25);--shadow:0 16px 40px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:
+radial-gradient(circle at 10% 0%,rgba(56,189,248,.18),transparent 30%),
+radial-gradient(circle at 90% 20%,rgba(239,68,68,.16),transparent 28%),
+linear-gradient(180deg,#06111f 0%,#091827 48%,#06111f 100%);
+color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;}
+body{min-height:100vh}
+button,input,select,textarea{font:inherit}
+.app-shell{width:min(100%,1080px);margin:0 auto;padding:14px 14px 88px}
+.hero{display:grid;grid-template-columns:70px 1fr;gap:12px;align-items:center;padding:14px;border:1px solid var(--border);background:rgba(8,20,36,.72);backdrop-filter:blur(16px);border-radius:22px;box-shadow:var(--shadow);position:sticky;top:8px;z-index:20}
+.logo{width:70px;height:70px;border-radius:16px;object-fit:cover;border:1px solid rgba(56,189,248,.4)}
+.kicker{font-size:12px;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+h1{font-size:20px;line-height:1.08;margin:2px 0 3px}
+.subtitle{font-size:12px;color:var(--muted);margin:0}
+.nav-tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 0 4px}
+.nav-tabs button{border:1px solid var(--border);background:rgba(15,30,52,.75);color:var(--muted);padding:10px 12px;border-radius:999px;white-space:nowrap;min-height:42px}
+.nav-tabs button.active{background:linear-gradient(135deg,var(--blue2),#0ea5e9);color:#fff;border-color:rgba(125,211,252,.8);box-shadow:0 0 18px rgba(56,189,248,.25)}
+.grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:840px){.grid.two{grid-template-columns:1.05fr .95fr}.grid.three{grid-template-columns:repeat(3,1fr)}}
+.card{background:rgba(11,23,40,.84);border:1px solid var(--border);border-radius:22px;padding:16px;box-shadow:var(--shadow)}
+.card h2{font-size:18px;margin:0 0 10px}
+.card h3{font-size:15px;margin:16px 0 8px;color:#c8e8ff}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:11px}
+label{font-size:12px;color:#b9c9dc;font-weight:700}
+input,select,textarea{width:100%;min-height:48px;border:1px solid var(--border);border-radius:14px;background:#071426;color:var(--text);padding:10px 12px;outline:none}
+textarea{min-height:88px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,189,248,.13)}
+.inline{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.toggle-grid{display:grid;grid-template-columns:1fr;gap:8px}
+@media(min-width:520px){.toggle-grid{grid-template-columns:1fr 1fr}}
+.check{display:flex;gap:10px;align-items:center;border:1px solid var(--border);border-radius:16px;background:#071426;padding:12px;min-height:54px;color:#dcecff}
+.check input{width:20px;min-height:20px;accent-color:var(--blue)}
+.material-row{display:grid;grid-template-columns:1fr 130px;gap:8px;align-items:center;border:1px solid var(--border);border-radius:16px;padding:10px;margin:8px 0;background:rgba(7,20,38,.72)}
+.material-row small{display:block;color:var(--muted);margin-top:2px}
+.qty{display:grid;grid-template-columns:38px 1fr 38px;align-items:center;gap:4px}
+.qty button{min-height:38px;border-radius:12px;border:1px solid var(--border);background:#0b2340;color:#fff;font-size:20px}
+.qty input{text-align:center;min-height:38px;padding:4px;border-radius:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:0;border-radius:16px;min-height:48px;padding:12px 14px;font-weight:800;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--blue2),#0ea5e9);box-shadow:0 10px 24px rgba(37,99,235,.25)}
+.btn.secondary{background:rgba(15,30,52,.95);border:1px solid var(--border);color:#d9edff;box-shadow:none}
+.btn.green{background:linear-gradient(135deg,#16a34a,#22c55e)}
+.btn.red{background:linear-gradient(135deg,#dc2626,#f97316)}
+.result-sticky{position:sticky;top:114px}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.metric{background:#071426;border:1px solid var(--border);border-radius:16px;padding:12px}
+.metric span{display:block;color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.metric strong{display:block;font-size:18px;margin-top:3px}
+.tiers{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}
+.tier{border:1px solid var(--border);background:#071426;border-radius:18px;padding:13px;cursor:pointer;position:relative}
+.tier.active{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,189,248,.12),0 0 18px rgba(56,189,248,.13)}
+.tier .name{font-size:13px;color:var(--muted);font-weight:800;text-transform:uppercase}
+.tier .price{font-size:26px;font-weight:900;margin:4px 0}
+.tier .note{font-size:12px;color:var(--muted)}
+.warn{color:#fbbf24}
+.good{color:#5eead4}
+.premium{color:#fda4af}
+.message-box{white-space:pre-wrap;background:#06111f;border:1px solid var(--border);border-radius:16px;padding:12px;color:#dbecff;max-height:420px;overflow:auto}
+.history-item{border:1px solid var(--border);border-radius:16px;padding:12px;background:#071426;margin:8px 0}
+.history-item strong{display:block}
+.history-item small{color:var(--muted)}
+.footer-bar{position:fixed;left:0;right:0;bottom:0;background:rgba(6,17,31,.86);backdrop-filter:blur(16px);border-top:1px solid var(--border);padding:10px 14px;z-index:30}
+.footer-bar .wrap{width:min(100%,1080px);margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hidden{display:none!important}
+.print-doc{display:none}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;border:1px solid var(--border);background:rgba(56,189,248,.10);padding:6px 8px;border-radius:999px;color:#d9f2ff;margin:2px 4px 2px 0}
+.notice{border-left:4px solid var(--orange);background:rgba(249,115,22,.08);padding:10px;border-radius:12px;color:#ffe9d4;font-size:13px}
+@media print{
+  body{background:#fff;color:#111}
+  .app-shell,.footer-bar{display:none!important}
+  .print-doc{display:block!important;max-width:780px;margin:0 auto;padding:24px;font-family:Arial,sans-serif;color:#222}
+  .print-head{display:flex;justify-content:space-between;gap:18px;border-bottom:3px solid #1d4ed8;padding-bottom:14px}
+  .print-logo{width:120px}
+  .print-title{font-size:24px;font-weight:800;color:#1d4ed8;margin:0}
+  .print-box{border:1px solid #ddd;border-radius:8px;padding:12px;margin-top:14px}
+  .print-table{width:100%;border-collapse:collapse;margin-top:10px}
+  .print-table th{background:#e5e7eb;text-align:left}
+  .print-table th,.print-table td{border-bottom:1px solid #ddd;padding:8px;font-size:12px}
+  .right{text-align:right}
+}
+
+</style>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="hero">
+      <img src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20680%20360%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22blue%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230ea5e9%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231d4ed8%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22hot%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23f97316%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23dc2626%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3Cfilter%20id%3D%22glow%22%3E%3CfeGaussianBlur%20stdDeviation%3D%224%22%20result%3D%22blur%22/%3E%3CfeMerge%3E%3CfeMergeNode%20in%3D%22blur%22/%3E%3CfeMergeNode%20in%3D%22SourceGraphic%22/%3E%3C/feMerge%3E%3C/filter%3E%0A%20%20%3C/defs%3E%0A%20%20%3Crect%20width%3D%22680%22%20height%3D%22360%22%20rx%3D%2228%22%20fill%3D%22%2307111f%22/%3E%0A%20%20%3Ccircle%20cx%3D%22340%22%20cy%3D%22135%22%20r%3D%2292%22%20fill%3D%22none%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%223%22%20opacity%3D%22.7%22/%3E%0A%20%20%3Cpath%20d%3D%22M340%2043a92%2092%200%200%201%200%20184c-25%200-46-20-46-46s21-46%2046-46%2046-20%2046-46-21-46-46-46z%22%20fill%3D%22url%28%23blue%29%22/%3E%0A%20%20%3Cpath%20d%3D%22M340%2043a92%2092%200%200%200%200%20184c25%200%2046-20%2046-46s-21-46-46-46-46-20-46-46%2021-46%2046-46z%22%20fill%3D%22url%28%23hot%29%22/%3E%0A%20%20%3Ccircle%20cx%3D%22340%22%20cy%3D%2289%22%20r%3D%2217%22%20fill%3D%22%23fff%22/%3E%0A%20%20%3Ccircle%20cx%3D%22340%22%20cy%3D%22181%22%20r%3D%2217%22%20fill%3D%22%23fff%22/%3E%0A%20%20%3Cg%20stroke%3D%22%231d4ed8%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%20filter%3D%22url%28%23glow%29%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M340%2073v32M324%2089h32M329%2078l22%2022M351%2078l-22%2022%22/%3E%0A%20%20%3C/g%3E%0A%20%20%3Cpath%20d%3D%22M338%20171c16%209%204%2023-3%2028%2020-4%2031-19%2018-36-3-4-6-8-6-15-11%206-19%2013-9%2023z%22%20fill%3D%22%23dc2626%22%20filter%3D%22url%28%23glow%29%22/%3E%0A%20%20%3Cg%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20opacity%3D%22.9%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M222%20135c-40-18-67-12-92%206%22/%3E%0A%20%20%20%20%3Cpath%20d%3D%22M458%20135c42-18%2070-12%2095%206%22/%3E%0A%20%20%3C/g%3E%0A%20%20%3Ctext%20x%3D%22340%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2C%20Helvetica%2C%20sans-serif%22%20font-size%3D%2234%22%20font-weight%3D%22800%22%20fill%3D%22%23ffffff%22%3EAIRE%20ACONDICIONADO%20Y%20CONFORT%3C/text%3E%0A%20%20%3Ctext%20x%3D%22340%22%20y%3D%22314%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2C%20Helvetica%2C%20sans-serif%22%20font-size%3D%2218%22%20fill%3D%22%2393c5fd%22%3EEl%20equilibrio%20perfecto%20para%20tu%20clima%3C/text%3E%0A%3C/svg%3E" class="logo" alt="Aire Acondicionado y Confort">
+      <div>
+        <div class="kicker">Cotizador HVAC Pro · V1</div>
+        <h1>Aire Acondicionado y Confort</h1>
+        <p class="subtitle">Precio claro · Alcance claro · Garantía clara</p>
+        <p class="subtitle" id="today"></p>
+      </div>
+    </header>
+
+    <nav class="nav-tabs">
+      <button type="button" data-tab="quote" class="active">Nueva cotización</button>
+      <button type="button" data-tab="result">Resultado</button>
+      <button type="button" data-tab="history">Historial</button>
+      <button type="button" data-tab="help">Reglas</button>
+    </nav>
+
+    <form id="quoteForm">
+      <section id="screen_quote" class="screen grid two">
+        <div class="card">
+          <h2>1. Datos del cliente</h2>
+          <div class="inline">
+            <div class="field">
+              <label>Cliente</label>
+              <input id="clientName" placeholder="Nombre del cliente">
+            </div>
+            <div class="field">
+              <label>Teléfono cliente</label>
+              <input id="clientPhone" inputmode="tel" placeholder="Ej. 3312345678">
+            </div>
+          </div>
+          <div class="field">
+            <label>Dirección o referencia</label>
+            <input id="address" placeholder="Calle, condominio, referencia">
+          </div>
+
+          <h2>2. Servicio y zona</h2>
+          <div class="field">
+            <label>Servicio</label>
+            <select id="service"></select>
+          </div>
+          <div class="field">
+            <label>Zona</label>
+            <select id="zone"></select>
+          </div>
+          <div class="inline">
+            <div class="field">
+              <label>Capacidad</label>
+              <select id="capacity">
+                <option>1 tonelada</option>
+                <option>1.5 toneladas</option>
+                <option>2 toneladas</option>
+                <option>Otra / revisar</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Voltaje</label>
+              <select id="voltage">
+                <option>110 V</option>
+                <option>220 V</option>
+                <option>No confirmado</option>
+              </select>
+            </div>
+          </div>
+          <div class="inline">
+            <div class="field">
+              <label>Tipo</label>
+              <select id="equipmentType">
+                <option>Inverter</option>
+                <option>Convencional</option>
+                <option>No confirmado</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Estado</label>
+              <select id="equipmentStatus">
+                <option>Equipo existente</option>
+                <option>Equipo nuevo</option>
+                <option>Venta + instalación</option>
+              </select>
+            </div>
+          </div>
+
+          <h2>3. Acceso y riesgo</h2>
+          <div class="field">
+            <label>Acceso</label>
+            <select id="access">
+              <option value="normal">Planta baja / acceso normal</option>
+              <option value="segundo_piso">Segundo piso / acceso medio</option>
+              <option value="azotea">Azotea</option>
+              <option value="dificil">Difícil acceso / altura</option>
+            </select>
+          </div>
+          <div class="toggle-grid">
+            <label class="check"><input type="checkbox" id="emergency"> Servicio urgente/nocturno (+20%)</label>
+            <label class="check"><input type="checkbox" id="includeIva"> Agregar IVA 16%</label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>4. Equipo y extras</h2>
+          <div class="field">
+            <label>Equipo incluido en cotización</label>
+            <select id="equipment"></select>
+          </div>
+          <div class="inline">
+            <div class="field">
+              <label>Cantidad equipo</label>
+              <input id="equipmentQty" type="number" min="0" step="1" value="0">
+            </div>
+            <div class="field hidden" id="equipmentManualBox">
+              <label>Costo equipo manual</label>
+              <input id="equipmentManualCost" type="number" min="0" step="50" value="0">
+            </div>
+          </div>
+          <div class="notice">
+            Los precios de equipo/material son base editable en archivos JSON. Revisa proveedor antes de cerrar venta grande.
+          </div>
+
+          <h3>Materiales / extras</h3>
+          <div id="materialsList"></div>
+
+          <div class="field">
+            <label>Notas internas o condiciones</label>
+            <textarea id="notes" placeholder="Ej. cliente pide condensador bajo escaleras, revisar eléctrico, no incluye bomba..."></textarea>
+          </div>
+
+          <div class="actions">
+            <button type="button" id="saveQuote" class="btn">Guardar cotización</button>
+            <button type="button" id="resetBtn" class="btn secondary">Limpiar</button>
+          </div>
+        </div>
+      </section>
+    </form>
+
+    <section id="screen_result" class="screen hidden grid two">
+      <div class="card">
+        <h2>Resultado automático</h2>
+        <div class="metrics">
+          <div class="metric"><span>Costo directo</span><strong id="directCost">$0</strong></div>
+          <div class="metric"><span>Costo real protegido</span><strong id="opCost">$0</strong></div>
+          <div class="metric"><span>Utilidad estimada</span><strong id="profit">$0</strong></div>
+          <div class="metric"><span>Margen real</span><strong id="margin">0%</strong></div>
+          <div class="metric"><span>Anticipo sugerido</span><strong id="deposit">$0</strong></div>
+          <div class="metric"><span>Regla</span><strong>No bajar del mínimo</strong></div>
+        </div>
+        <div id="tiers" class="tiers"></div>
+        <div class="actions" style="margin-top:12px">
+          <button type="button" id="copyBtn" class="btn secondary">Copiar WhatsApp</button>
+          <button type="button" id="waBtn" class="btn green">Abrir WhatsApp</button>
+          <button type="button" id="printBtn" class="btn">Imprimir / PDF</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Mensaje listo para enviar</h2>
+        <div id="whatsappPreview" class="message-box"></div>
+      </div>
+    </section>
+
+    <section id="screen_history" class="screen hidden">
+      <div class="card">
+        <h2>Historial local</h2>
+        <p class="subtitle">Se guarda solo en este celular/navegador. No se sube a internet.</p>
+        <div id="historyList"></div>
+        <button type="button" id="clearHistory" class="btn red">Borrar historial</button>
+      </div>
+    </section>
+
+    <section id="screen_help" class="screen hidden">
+      <div class="card">
+        <h2>Reglas de Aire Acondicionado y Confort</h2>
+        <p><span class="badge">3310766424 WhatsApp/Llamadas</span><span class="badge">5615326488 WhatsApp/Llamadas</span></p>
+        <h3>Regla de cálculo</h3>
+        <p>Costo real = mano de obra + ayudante + materiales + consumibles + traslado + herramienta + riesgo + gasto fijo.</p>
+        <p>Precio mínimo = costo real ÷ 0.75. Recomendado = costo real ÷ 0.60. Premium = costo real ÷ 0.45.</p>
+        <h3>Pisos mínimos</h3>
+        <p>La app usa pisos comerciales para evitar precios irreales. Si la fórmula sale demasiado baja, gana el piso mínimo del negocio.</p>
+        <h3>Garantía gas</h3>
+        <p>Carga de gas sin reparar fuga no garantiza duración del refrigerante. Para garantizar, primero se debe localizar y corregir la fuga.</p>
+        <h3>GitHub Pages</h3>
+        <p>Sube estos archivos al repositorio y activa GitHub Pages desde la rama principal. No uses claves privadas ni tokens dentro de JavaScript.</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="footer-bar">
+    <div class="wrap">
+      <button type="button" class="btn secondary" onclick="showTab('quote')">Editar</button>
+      <button type="button" class="btn" onclick="showTab('result')">Ver precio</button>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden" style="position:fixed;left:16px;right:16px;bottom:82px;background:#0b2340;border:1px solid rgba(56,189,248,.45);padding:12px;border-radius:16px;text-align:center;z-index:60">Listo</div>
+  <section id="printDoc" class="print-doc"></section>
+<script>
+const INLINE_CONFIG = {
+  "business_settings": {
+    "company_name": "Aire Acondicionado y Confort",
+    "slogan": "El equilibrio perfecto para tu clima",
+    "owner": "César Daniel Gamboa González",
+    "primary_whatsapp": "3310766424",
+    "secondary_whatsapp": "5615326488",
+    "phones": [
+      "3310766424",
+      "5615326488"
+    ],
+    "service_area": "Vistas California Residencial, El Salto, Jalisco",
+    "website": "https://proyectoaireyconfort-lab.github.io/aire-acondicionado-y-confort/",
+    "iva_rate": 0.16,
+    "overhead_rate": 0.1,
+    "default_validity_days": 5,
+    "currency": "MXN",
+    "quote_prefix": "AAC"
+  },
+  "services": {
+    "diagnostico": {
+      "name": "Diagnóstico técnico",
+      "category": "Diagnóstico",
+      "description": "Revisión técnica para detectar falla y cotizar reparación.",
+      "labor": 300,
+      "helper": 0,
+      "consumables": 40,
+      "tool_wear": 70,
+      "risk": 100,
+      "requires_helper": false,
+      "warranty_rule": "diagnostico",
+      "floors": {
+        "neighbor": {
+          "minimum": 300,
+          "recommended": 400,
+          "premium": 600
+        },
+        "standard": {
+          "minimum": 500,
+          "recommended": 650,
+          "premium": 900
+        }
+      },
+      "deposit_mode": "none"
+    },
+    "mantenimiento": {
+      "name": "Mantenimiento preventivo minisplit",
+      "category": "Mantenimiento",
+      "description": "Limpieza, lavado, drenaje, revisión general y prueba de funcionamiento.",
+      "labor": 700,
+      "helper": 0,
+      "consumables": 120,
+      "tool_wear": 100,
+      "risk": 150,
+      "requires_helper": false,
+      "warranty_rule": "mantenimiento",
+      "floors": {
+        "neighbor": {
+          "minimum": 850,
+          "recommended": 950,
+          "premium": 1200
+        },
+        "standard": {
+          "minimum": 900,
+          "recommended": 1100,
+          "premium": 1500
+        }
+      },
+      "deposit_mode": "none"
+    },
+    "instalacion_basica": {
+      "name": "Instalación básica de minisplit",
+      "category": "Instalación",
+      "description": "Instalación de unidad interior/exterior, conexión básica, vacío y prueba.",
+      "labor": 1500,
+      "helper": 600,
+      "consumables": 220,
+      "tool_wear": 220,
+      "risk": 300,
+      "requires_helper": true,
+      "warranty_rule": "instalacion",
+      "floors": {
+        "neighbor": {
+          "minimum": 2500,
+          "recommended": 3000,
+          "premium": 3500
+        },
+        "standard": {
+          "minimum": 3000,
+          "recommended": 3500,
+          "premium": 4200
+        }
+      },
+      "deposit_mode": "labor"
+    },
+    "instalacion_materiales": {
+      "name": "Instalación con materiales",
+      "category": "Instalación",
+      "description": "Instalación básica más materiales seleccionados por el usuario.",
+      "labor": 1700,
+      "helper": 650,
+      "consumables": 250,
+      "tool_wear": 250,
+      "risk": 400,
+      "requires_helper": true,
+      "warranty_rule": "instalacion",
+      "floors": {
+        "neighbor": {
+          "minimum": 5500,
+          "recommended": 6200,
+          "premium": 7500
+        },
+        "standard": {
+          "minimum": 6000,
+          "recommended": 7000,
+          "premium": 8500
+        }
+      },
+      "deposit_mode": "materials"
+    },
+    "electrico_minisplit": {
+      "name": "Trabajo eléctrico para minisplit",
+      "category": "Eléctrico",
+      "description": "Apoyo eléctrico básico relacionado con minisplit. No sustituye proyecto eléctrico.",
+      "labor": 900,
+      "helper": 0,
+      "consumables": 80,
+      "tool_wear": 120,
+      "risk": 250,
+      "requires_helper": false,
+      "warranty_rule": "electrico",
+      "floors": {
+        "neighbor": {
+          "minimum": 900,
+          "recommended": 1300,
+          "premium": 1800
+        },
+        "standard": {
+          "minimum": 1200,
+          "recommended": 1600,
+          "premium": 2200
+        }
+      },
+      "deposit_mode": "materials"
+    },
+    "reparacion": {
+      "name": "Reparación general",
+      "category": "Reparación",
+      "description": "Corrección de falla autorizada por cliente. Refacciones se agregan aparte.",
+      "labor": 900,
+      "helper": 0,
+      "consumables": 100,
+      "tool_wear": 150,
+      "risk": 350,
+      "requires_helper": false,
+      "warranty_rule": "reparacion",
+      "floors": {
+        "neighbor": {
+          "minimum": 700,
+          "recommended": 1000,
+          "premium": 1500
+        },
+        "standard": {
+          "minimum": 900,
+          "recommended": 1300,
+          "premium": 1900
+        }
+      },
+      "deposit_mode": "materials"
+    },
+    "carga_gas": {
+      "name": "Carga/Ajuste de refrigerante",
+      "category": "Refrigerante",
+      "description": "Carga o ajuste de refrigerante. Si no se repara fuga, no se garantiza duración del gas.",
+      "labor": 500,
+      "helper": 0,
+      "consumables": 120,
+      "tool_wear": 120,
+      "risk": 250,
+      "requires_helper": false,
+      "warranty_rule": "gas_sin_fuga",
+      "floors": {
+        "neighbor": {
+          "minimum": 500,
+          "recommended": 800,
+          "premium": 1200
+        },
+        "standard": {
+          "minimum": 700,
+          "recommended": 1000,
+          "premium": 1500
+        }
+      },
+      "deposit_mode": "none"
+    },
+    "busqueda_fuga": {
+      "name": "Búsqueda de fuga",
+      "category": "Refrigerante",
+      "description": "Revisión dedicada para localizar fuga. Reparación se cotiza aparte si aplica.",
+      "labor": 900,
+      "helper": 0,
+      "consumables": 180,
+      "tool_wear": 220,
+      "risk": 400,
+      "requires_helper": false,
+      "warranty_rule": "busqueda_fuga",
+      "floors": {
+        "neighbor": {
+          "minimum": 700,
+          "recommended": 1000,
+          "premium": 1500
+        },
+        "standard": {
+          "minimum": 900,
+          "recommended": 1300,
+          "premium": 2000
+        }
+      },
+      "deposit_mode": "none"
+    },
+    "venta_instalacion": {
+      "name": "Venta de equipo + instalación",
+      "category": "Venta + instalación",
+      "description": "Equipo nuevo más instalación básica y prueba de funcionamiento.",
+      "labor": 1700,
+      "helper": 650,
+      "consumables": 260,
+      "tool_wear": 260,
+      "risk": 450,
+      "requires_helper": true,
+      "warranty_rule": "equipo_nuevo",
+      "floors": {
+        "neighbor": {
+          "minimum": 9000,
+          "recommended": 11000,
+          "premium": 13500
+        },
+        "standard": {
+          "minimum": 10000,
+          "recommended": 12500,
+          "premium": 15000
+        }
+      },
+      "deposit_mode": "equipment"
+    }
+  },
+  "zones": {
+    "vistas_california": {
+      "name": "Vistas California Residencial",
+      "type": "neighbor",
+      "travel": 80,
+      "distance_note": "Vecino / zona inmediata",
+      "travel_time": "5-10 min"
+    },
+    "el_salto": {
+      "name": "El Salto",
+      "type": "standard",
+      "travel": 150,
+      "distance_note": "Zona cercana",
+      "travel_time": "15-30 min"
+    },
+    "tonala": {
+      "name": "Tonalá",
+      "type": "standard",
+      "travel": 220,
+      "distance_note": "Traslado medio",
+      "travel_time": "30-45 min"
+    },
+    "tlaquepaque": {
+      "name": "Tlaquepaque",
+      "type": "standard",
+      "travel": 260,
+      "distance_note": "Traslado medio",
+      "travel_time": "35-50 min"
+    },
+    "guadalajara": {
+      "name": "Guadalajara",
+      "type": "standard",
+      "travel": 320,
+      "distance_note": "Traslado alto",
+      "travel_time": "45-65 min"
+    },
+    "zapopan": {
+      "name": "Zapopan",
+      "type": "standard",
+      "travel": 450,
+      "distance_note": "Traslado alto",
+      "travel_time": "60-90 min"
+    },
+    "tlajomulco": {
+      "name": "Tlajomulco",
+      "type": "standard",
+      "travel": 450,
+      "distance_note": "Traslado alto",
+      "travel_time": "60-90 min"
+    },
+    "otra": {
+      "name": "Otra zona",
+      "type": "standard",
+      "travel": 500,
+      "distance_note": "Revisar ubicación",
+      "travel_time": "Variable"
+    }
+  },
+  "materials": {
+    "cobre_extra_m": {
+      "name": "Metro extra de tubería/cable/drenaje",
+      "unit": "m",
+      "cost": 260,
+      "default": 0
+    },
+    "cable_extra_m": {
+      "name": "Cable eléctrico extra",
+      "unit": "m",
+      "cost": 45,
+      "default": 0
+    },
+    "manguera_drenaje_m": {
+      "name": "Manguera de drenaje extra",
+      "unit": "m",
+      "cost": 25,
+      "default": 0
+    },
+    "mensulas": {
+      "name": "Ménsulas / soporte pared",
+      "unit": "par",
+      "cost": 350,
+      "default": 0
+    },
+    "bomba_condensados": {
+      "name": "Bomba de condensados",
+      "unit": "pza",
+      "cost": 1250,
+      "default": 0
+    },
+    "pastilla_caja": {
+      "name": "Pastilla + caja/centro carga básico",
+      "unit": "pza",
+      "cost": 450,
+      "default": 0
+    },
+    "perforacion_concreto": {
+      "name": "Perforación muro difícil",
+      "unit": "pza",
+      "cost": 350,
+      "default": 0
+    },
+    "quimico_limpieza": {
+      "name": "Químico/consumible extra",
+      "unit": "pza",
+      "cost": 120,
+      "default": 0
+    },
+    "refrigerante_kg": {
+      "name": "Refrigerante adicional",
+      "unit": "kg",
+      "cost": 600,
+      "default": 0
+    },
+    "refaccion_manual": {
+      "name": "Refacción/extra manual",
+      "unit": "$",
+      "cost": 1,
+      "default": 0
+    }
+  },
+  "equipment": {
+    "none": {
+      "name": "Sin equipo incluido",
+      "cost": 0
+    },
+    "mirage_x_1tr_solo_frio": {
+      "name": "Mirage Inverter X 1TR Solo frío",
+      "cost": 5400
+    },
+    "mirage_x_1tr_frio_calor": {
+      "name": "Mirage Inverter X 1TR Frío/calor",
+      "cost": 5980
+    },
+    "mirage_v32_1tr_solo_frio": {
+      "name": "Mirage V32 1TR Solo frío",
+      "cost": 5550
+    },
+    "ua_1tr_referencia": {
+      "name": "UA 1TR referencia",
+      "cost": 6200
+    },
+    "otro_manual": {
+      "name": "Otro equipo / costo manual",
+      "cost": 0
+    }
+  },
+  "warranty_rules": {
+    "diagnostico": "El diagnóstico incluye revisión y explicación de la falla. No incluye reparación ni refacciones.",
+    "mantenimiento": "Garantía limitada sobre limpieza y drenaje revisado. No cubre fallas previas, falta de gas, fugas, piezas dañadas ni problemas eléctricos.",
+    "instalacion": "Garantía sobre mano de obra de instalación. No cubre fallas del equipo, variaciones eléctricas, manipulación de terceros, falta de mantenimiento, fugas no relacionadas con la instalación o cambios posteriores.",
+    "electrico": "Garantía limitada sobre la conexión realizada. No sustituye revisión eléctrica integral del inmueble.",
+    "reparacion": "Garantía limitada sobre la reparación o pieza reemplazada, según diagnóstico y condiciones del equipo.",
+    "gas_sin_fuga": "Carga de refrigerante sin reparación de fuga: no se garantiza la duración del gas si existe fuga oculta o no corregida.",
+    "busqueda_fuga": "La búsqueda de fuga localiza o delimita el problema. Reparaciones, soldaduras, presurización con nitrógeno o recarga se cotizan aparte si aplica.",
+    "equipo_nuevo": "Equipo sujeto a garantía del fabricante. La mano de obra aplica según condiciones de instalación y uso correcto."
+  }
+};
+
+
+const App = {
+  cfg: {},
+  state: {
+    selectedTier: "recommended",
+    quote: null
+  }
+};
+
+const $ = (id) => document.getElementById(id);
+
+function money(value){
+  const n = Number(value || 0);
+  return n.toLocaleString("es-MX", {style:"currency", currency:"MXN"});
+}
+function safeNumber(v){
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+function roundMoney(n){ return Math.round((n + Number.EPSILON) * 100) / 100; }
+function digitsOnly(v){ return String(v || "").replace(/\D/g,""); }
+
+async function loadConfig(){
+  App.cfg = JSON.parse(JSON.stringify(INLINE_CONFIG));
+}
+
+function getFormData(){
+  const materialQty = {};
+  Object.keys(App.cfg.materials).forEach(id => {
+    materialQty[id] = safeNumber($(`mat_${id}`)?.value || 0);
+  });
+
+  const equipmentId = $("equipment").value;
+  const equipmentManualCost = safeNumber($("equipmentManualCost").value);
+  const equipmentQty = safeNumber($("equipmentQty").value || 0);
+
+  return {
+    clientName: $("clientName").value.trim(),
+    clientPhone: digitsOnly($("clientPhone").value),
+    address: $("address").value.trim(),
+    notes: $("notes").value.trim(),
+    serviceId: $("service").value,
+    zoneId: $("zone").value,
+    capacity: $("capacity").value,
+    voltage: $("voltage").value,
+    equipmentType: $("equipmentType").value,
+    equipmentStatus: $("equipmentStatus").value,
+    equipmentId,
+    equipmentQty,
+    equipmentManualCost,
+    materialQty,
+    access: $("access").value,
+    emergency: $("emergency").checked,
+    includeIva: $("includeIva").checked
+  };
+}
+
+function materialCost(form){
+  let total = 0;
+  const lines = [];
+  Object.entries(form.materialQty).forEach(([id, qty]) => {
+    if(qty <= 0) return;
+    const meta = App.cfg.materials[id];
+    const cost = roundMoney(qty * meta.cost);
+    total += cost;
+    lines.push({id, name: meta.name, unit: meta.unit, qty, cost});
+  });
+  return {total: roundMoney(total), lines};
+}
+
+function equipmentCost(form){
+  const meta = App.cfg.equipment[form.equipmentId] || App.cfg.equipment.none;
+  let unitCost = meta.cost || 0;
+  if(form.equipmentId === "otro_manual") unitCost = form.equipmentManualCost || 0;
+  const qty = Math.max(0, form.equipmentQty || 0);
+  const total = roundMoney(unitCost * qty);
+  return {total, unitCost, qty, name: meta.name};
+}
+
+function accessRules(access){
+  const map = {
+    normal: {fixed:0, multiplier:0, label:"Acceso normal"},
+    segundo_piso: {fixed:250, multiplier:0, label:"Segundo piso / acceso medio"},
+    azotea: {fixed:400, multiplier:0.08, label:"Azotea"},
+    dificil: {fixed:600, multiplier:0.15, label:"Difícil acceso / altura"}
+  };
+  return map[access] || map.normal;
+}
+
+function calculate(){
+  const form = getFormData();
+  const service = App.cfg.services[form.serviceId];
+  const zone = App.cfg.zones[form.zoneId];
+  const settings = App.cfg.business_settings;
+  const mat = materialCost(form);
+  const eq = equipmentCost(form);
+  const access = accessRules(form.access);
+
+  const labor = service.labor + service.helper;
+  const serviceBase = service.labor + service.helper + service.consumables + service.tool_wear + service.risk;
+  const travel = zone.travel || 0;
+  const directCost = roundMoney(serviceBase + travel + access.fixed + mat.total + eq.total);
+  let operationalCost = roundMoney(directCost * (1 + settings.overhead_rate));
+  if(access.multiplier > 0) operationalCost = roundMoney(operationalCost * (1 + access.multiplier));
+  if(form.emergency) operationalCost = roundMoney(operationalCost * 1.20);
+
+  const clientMode = zone.type === "neighbor" ? "neighbor" : "standard";
+  const floors = service.floors[clientMode] || service.floors.standard;
+
+  const calcMin = roundMoney(operationalCost / 0.75);
+  const calcRec = roundMoney(operationalCost / 0.60);
+  const calcPrem = roundMoney(operationalCost / 0.45);
+
+  const tiers = {
+    minimum: {
+      label: "Mínimo protegido",
+      price: Math.max(calcMin, floors.minimum),
+      calcPrice: calcMin,
+      floor: floors.minimum,
+      marginTarget: 0.25,
+      note: "Solo si quieres cerrar rápido o es vecino sencillo."
+    },
+    recommended: {
+      label: "Recomendado",
+      price: Math.max(calcRec, floors.recommended),
+      calcPrice: calcRec,
+      floor: floors.recommended,
+      marginTarget: 0.40,
+      note: "Mejor equilibrio entre venta, utilidad y protección."
+    },
+    premium: {
+      label: "Premium",
+      price: Math.max(calcPrem, floors.premium),
+      calcPrice: calcPrem,
+      floor: floors.premium,
+      marginTarget: 0.55,
+      note: "Para urgencias, mayor garantía, riesgo o cliente exigente."
+    }
+  };
+
+  Object.keys(tiers).forEach(k => {
+    tiers[k].price = roundMoney(tiers[k].price);
+    const net = tiers[k].price;
+    const iva = form.includeIva ? roundMoney(net * settings.iva_rate) : 0;
+    tiers[k].iva = iva;
+    tiers[k].total = roundMoney(net + iva);
+    tiers[k].profit = roundMoney(net - operationalCost);
+    tiers[k].realMargin = net > 0 ? roundMoney((tiers[k].profit / net) * 100) : 0;
+  });
+
+  let deposit = 0;
+  if(service.deposit_mode === "none"){
+    deposit = 0;
+  } else if(service.deposit_mode === "equipment"){
+    deposit = Math.max(eq.total, tiers.recommended.price * 0.70);
+  } else if(service.deposit_mode === "materials"){
+    deposit = Math.max(mat.total + eq.total, tiers.recommended.price * 0.50);
+  } else {
+    deposit = Math.max(500, tiers.recommended.price * 0.30);
+  }
+  deposit = Math.ceil(deposit / 50) * 50;
+
+  const quote = {
+    id: `${settings.quote_prefix}-${new Date().toISOString().slice(0,10).replaceAll("-","")}-${Date.now().toString().slice(-5)}`,
+    createdAt: new Date().toISOString(),
+    form, service, zone, settings, mat, eq, access,
+    costBreakdown: {
+      labor,
+      serviceLabor: service.labor,
+      helper: service.helper,
+      consumables: service.consumables,
+      toolWear: service.tool_wear,
+      risk: service.risk,
+      travel,
+      accessFixed: access.fixed,
+      materials: mat.total,
+      equipment: eq.total,
+      directCost,
+      overhead: roundMoney(operationalCost - directCost),
+      operationalCost
+    },
+    tiers,
+    deposit,
+    warrantyText: App.cfg.warranty_rules[service.warranty_rule] || ""
+  };
+
+  App.state.quote = quote;
+  return quote;
+}
+
+function renderSelectors(){
+  const serviceSelect = $("service");
+  serviceSelect.innerHTML = Object.entries(App.cfg.services).map(([id,s]) => `<option value="${id}">${s.name}</option>`).join("");
+  const zoneSelect = $("zone");
+  zoneSelect.innerHTML = Object.entries(App.cfg.zones).map(([id,z]) => `<option value="${id}">${z.name}</option>`).join("");
+  const equipmentSelect = $("equipment");
+  equipmentSelect.innerHTML = Object.entries(App.cfg.equipment).map(([id,e]) => `<option value="${id}">${e.name}</option>`).join("");
+
+  const mats = $("materialsList");
+  mats.innerHTML = Object.entries(App.cfg.materials).map(([id,m]) => `
+    <div class="material-row">
+      <div>
+        <strong>${m.name}</strong>
+        <small>${m.unit === "$" ? "Captura monto en pesos" : `${money(m.cost)} por ${m.unit}`}</small>
+      </div>
+      <div class="qty">
+        <button type="button" data-minus="${id}">−</button>
+        <input id="mat_${id}" type="number" min="0" step="${m.unit === "$" ? "50" : "1"}" value="${m.default || 0}">
+        <button type="button" data-plus="${id}">+</button>
+      </div>
+    </div>
+  `).join("");
+
+  document.querySelectorAll("[data-plus]").forEach(btn => btn.addEventListener("click", () => {
+    const id = btn.dataset.plus;
+    const input = $(`mat_${id}`);
+    const step = App.cfg.materials[id].unit === "$" ? 50 : 1;
+    input.value = safeNumber(input.value) + step;
+    updateAll();
+  }));
+  document.querySelectorAll("[data-minus]").forEach(btn => btn.addEventListener("click", () => {
+    const id = btn.dataset.minus;
+    const input = $(`mat_${id}`);
+    const step = App.cfg.materials[id].unit === "$" ? 50 : 1;
+    input.value = Math.max(0, safeNumber(input.value) - step);
+    updateAll();
+  }));
+}
+
+function tierClass(key){
+  if(key === "minimum") return "warn";
+  if(key === "premium") return "premium";
+  return "good";
+}
+
+function renderQuote(){
+  const q = App.state.quote || calculate();
+  const selected = q.tiers[App.state.selectedTier];
+  $("directCost").textContent = money(q.costBreakdown.directCost);
+  $("opCost").textContent = money(q.costBreakdown.operationalCost);
+  $("profit").textContent = money(selected.profit);
+  $("margin").textContent = `${selected.realMargin}%`;
+  $("deposit").textContent = money(q.deposit);
+
+  $("tiers").innerHTML = Object.entries(q.tiers).map(([key,t]) => `
+    <div class="tier ${App.state.selectedTier === key ? "active" : ""}" data-tier="${key}">
+      <div class="name ${tierClass(key)}">${t.label}</div>
+      <div class="price">${money(t.total)}</div>
+      <div class="note">${q.form.includeIva ? `Incluye IVA: ${money(t.iva)}.` : "Sin IVA agregado."} ${t.note}</div>
+      <div class="note">Utilidad aprox: ${money(t.profit)} · Margen real: ${t.realMargin}%</div>
+    </div>
+  `).join("");
+
+  document.querySelectorAll("[data-tier]").forEach(card => {
+    card.addEventListener("click", () => {
+      App.state.selectedTier = card.dataset.tier;
+      renderQuote();
+    });
+  });
+
+  $("whatsappPreview").textContent = generateWhatsAppMessage();
+  renderHistory();
+  renderPrintDoc();
+}
+
+function generateWhatsAppMessage(){
+  const q = App.state.quote || calculate();
+  const t = q.tiers[App.state.selectedTier];
+  const settings = q.settings;
+  const ivaLine = q.form.includeIva ? `\nIVA incluido: ${money(t.iva)}` : `\nFactura/IVA: en caso de requerir factura, se agrega IVA.`;
+  const materialsLine = q.mat.lines.length ? q.mat.lines.map(l => `• ${l.name}: ${l.qty} ${l.unit}`).join("\n") : "• Sin materiales extra seleccionados";
+  const equipmentLine = q.eq.total > 0 ? `\nEquipo incluido: ${q.eq.qty} × ${q.eq.name}` : "";
+  const client = q.form.clientName || "Cliente";
+  return `❄️🔥 *${settings.company_name.toUpperCase()}*
+_${settings.slogan}_
+
+*Cotización:* ${q.id}
+*Cliente:* ${client}
+*Servicio:* ${q.service.name}
+*Zona:* ${q.zone.name}
+*Equipo:* ${q.form.capacity} / ${q.form.voltage} / ${q.form.equipmentType}
+*Acceso:* ${q.access.label}${equipmentLine}
+
+*Precio:* ${money(t.total)} MXN${ivaLine}
+*Anticipo sugerido:* ${q.deposit > 0 ? money(q.deposit) : "No requerido para este servicio"}
+
+*Incluye:*
+✅ Mano de obra técnica
+✅ Consumibles estándar del servicio
+✅ Herramienta y prueba de funcionamiento
+✅ Explicación del trabajo realizado
+
+*Extras considerados:*
+${materialsLine}
+
+*Condiciones:*
+${q.warrantyText}
+
+*No incluye, salvo que esté agregado arriba:*
+❌ Trabajo eléctrico adicional
+❌ Refacciones no mencionadas
+❌ Material extra no seleccionado
+❌ Maniobras especiales no declaradas
+❌ Reparación de fugas si solo se solicita carga de gas
+
+Cotización válida por ${settings.default_validity_days} días.
+Llamadas y WhatsApp: ${settings.phones.join(" | ")}
+
+Atte. César - Aire Acondicionado y Confort`;
+}
+
+function updateAll(save=false){
+  calculate();
+  renderQuote();
+  if(save) saveCurrentQuote();
+}
+
+function saveCurrentQuote(){
+  const q = App.state.quote || calculate();
+  const t = q.tiers[App.state.selectedTier];
+  const item = {
+    id: q.id,
+    createdAt: q.createdAt,
+    clientName: q.form.clientName || "Cliente sin nombre",
+    serviceName: q.service.name,
+    zoneName: q.zone.name,
+    selectedTier: App.state.selectedTier,
+    total: t.total,
+    profit: t.profit
+  };
+  const history = loadHistory();
+  const exists = history.some(x => x.id === item.id);
+  if(!exists){
+    history.unshift(item);
+    localStorage.setItem("aacc_quote_history_v1", JSON.stringify(history.slice(0,60)));
+  }
+  renderHistory();
+}
+
+function loadHistory(){
+  try { return JSON.parse(localStorage.getItem("aacc_quote_history_v1") || "[]"); }
+  catch { return []; }
+}
+function renderHistory(){
+  const history = loadHistory();
+  const el = $("historyList");
+  if(!history.length){
+    el.innerHTML = `<p class="subtitle">Todavía no hay cotizaciones guardadas en este celular.</p>`;
+    return;
+  }
+  el.innerHTML = history.slice(0,10).map(h => `
+    <div class="history-item">
+      <strong>${h.clientName} · ${money(h.total)}</strong>
+      <small>${h.serviceName} · ${h.zoneName}<br>${new Date(h.createdAt).toLocaleString("es-MX")}</small>
+    </div>
+  `).join("");
+}
+
+function copyMessage(){
+  navigator.clipboard.writeText(generateWhatsAppMessage()).then(() => {
+    toast("Mensaje copiado.");
+  }).catch(() => {
+    $("whatsappPreview").focus();
+  });
+}
+function openWhatsApp(){
+  const q = App.state.quote || calculate();
+  const msg = encodeURIComponent(generateWhatsAppMessage());
+  const clientPhone = digitsOnly(q.form.clientPhone);
+  const url = clientPhone.length >= 10 ? `https://wa.me/52${clientPhone.slice(-10)}?text=${msg}` : `https://wa.me/?text=${msg}`;
+  window.open(url, "_blank");
+}
+function toast(msg){
+  const el = $("toast");
+  el.textContent = msg;
+  el.classList.remove("hidden");
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => el.classList.add("hidden"), 2000);
+}
+
+function renderPrintDoc(){
+  const q = App.state.quote || calculate();
+  const t = q.tiers[App.state.selectedTier];
+  const ivaLabel = q.form.includeIva ? money(t.iva) : "$0.00";
+  $("printDoc").innerHTML = `
+    <div class="print-head">
+      <div>
+        <p class="print-title">${q.settings.company_name}</p>
+        <p>${q.settings.slogan}</p>
+        <p>${q.settings.service_area}<br>Tel/WhatsApp: ${q.settings.phones.join(" | ")}</p>
+      </div>
+      <img class="print-logo" src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20680%20360%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22blue%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230ea5e9%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231d4ed8%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22hot%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23f97316%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23dc2626%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3Cfilter%20id%3D%22glow%22%3E%3CfeGaussianBlur%20stdDeviation%3D%224%22%20result%3D%22blur%22/%3E%3CfeMerge%3E%3CfeMergeNode%20in%3D%22blur%22/%3E%3CfeMergeNode%20in%3D%22SourceGraphic%22/%3E%3C/feMerge%3E%3C/filter%3E%0A%20%20%3C/defs%3E%0A%20%20%3Crect%20width%3D%22680%22%20height%3D%22360%22%20rx%3D%2228%22%20fill%3D%22%2307111f%22/%3E%0A%20%20%3Ccircle%20cx%3D%22340%22%20cy%3D%22135%22%20r%3D%2292%22%20fill%3D%22none%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%223%22%20opacity%3D%22.7%22/%3E%0A%20%20%3Cpath%20d%3D%22M340%2043a92%2092%200%200%201%200%20184c-25%200-46-20-46-46s21-46%2046-46%2046-20%2046-46-21-46-46-46z%22%20fill%3D%22url%28%23blue%29%22/%3E%0A%20%20%3Cpath%20d%3D%22M340%2043a92%2092%200%200%200%200%20184c25%200%2046-20%2046-46s-21-46-46-46-46-20-46-46%2021-46%2046-46z%22%20fill%3D%22url%28%23hot%29%22/%3E%0A%20%20%3Ccircle%20cx%3D%22340%22%20cy%3D%2289%22%20r%3D%2217%22%20fill%3D%22%23fff%22/%3E%0A%20%20%3Ccircle%20cx%3D%22340%22%20cy%3D%22181%22%20r%3D%2217%22%20fill%3D%22%23fff%22/%3E%0A%20%20%3Cg%20stroke%3D%22%231d4ed8%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%20filter%3D%22url%28%23glow%29%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M340%2073v32M324%2089h32M329%2078l22%2022M351%2078l-22%2022%22/%3E%0A%20%20%3C/g%3E%0A%20%20%3Cpath%20d%3D%22M338%20171c16%209%204%2023-3%2028%2020-4%2031-19%2018-36-3-4-6-8-6-15-11%206-19%2013-9%2023z%22%20fill%3D%22%23dc2626%22%20filter%3D%22url%28%23glow%29%22/%3E%0A%20%20%3Cg%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20opacity%3D%22.9%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M222%20135c-40-18-67-12-92%206%22/%3E%0A%20%20%20%20%3Cpath%20d%3D%22M458%20135c42-18%2070-12%2095%206%22/%3E%0A%20%20%3C/g%3E%0A%20%20%3Ctext%20x%3D%22340%22%20y%3D%22280%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2C%20Helvetica%2C%20sans-serif%22%20font-size%3D%2234%22%20font-weight%3D%22800%22%20fill%3D%22%23ffffff%22%3EAIRE%20ACONDICIONADO%20Y%20CONFORT%3C/text%3E%0A%20%20%3Ctext%20x%3D%22340%22%20y%3D%22314%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2C%20Helvetica%2C%20sans-serif%22%20font-size%3D%2218%22%20fill%3D%22%2393c5fd%22%3EEl%20equilibrio%20perfecto%20para%20tu%20clima%3C/text%3E%0A%3C/svg%3E" alt="Logo">
+    </div>
+    <div class="print-box">
+      <strong>COTIZACIÓN FORMAL</strong><br>
+      Folio: ${q.id}<br>
+      Fecha: ${new Date(q.createdAt).toLocaleDateString("es-MX")}<br>
+      Vigencia: ${q.settings.default_validity_days} días
+    </div>
+    <div class="print-box">
+      <strong>Cliente:</strong> ${q.form.clientName || "Cliente"}<br>
+      <strong>Teléfono:</strong> ${q.form.clientPhone || "No capturado"}<br>
+      <strong>Ubicación:</strong> ${q.zone.name}${q.form.address ? " · " + q.form.address : ""}<br>
+      <strong>Equipo:</strong> ${q.form.capacity} / ${q.form.voltage} / ${q.form.equipmentType}
+    </div>
+    <table class="print-table">
+      <thead><tr><th>Concepto</th><th class="right">Importe</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>${q.service.name}</strong><br>${q.service.description}<br>Acceso: ${q.access.label}</td>
+          <td class="right">${money(t.price)}</td>
+        </tr>
+        <tr><td>IVA 16%</td><td class="right">${ivaLabel}</td></tr>
+        <tr><td><strong>Total</strong></td><td class="right"><strong>${money(t.total)}</strong></td></tr>
+        <tr><td>Anticipo sugerido</td><td class="right">${q.deposit > 0 ? money(q.deposit) : "No requerido"}</td></tr>
+      </tbody>
+    </table>
+    <div class="print-box">
+      <strong>Extras considerados:</strong><br>
+      ${q.mat.lines.length ? q.mat.lines.map(l => `${l.name}: ${l.qty} ${l.unit}`).join("<br>") : "Sin materiales extra seleccionados."}
+      ${q.eq.total > 0 ? `<br>Equipo: ${q.eq.qty} × ${q.eq.name}` : ""}
+    </div>
+    <div class="print-box">
+      <strong>Garantía y condiciones:</strong><br>
+      ${q.warrantyText}<br><br>
+      No incluye refacciones, material adicional, trabajo eléctrico nuevo, maniobras especiales, obra civil, resanes, pintura o reparaciones no mencionadas. Cualquier cambio en distancia, altura, acceso o condiciones del lugar puede modificar el precio, avisando antes de realizar el trabajo.
+    </div>
+    <div class="print-box">
+      <strong>Notas:</strong><br>${q.form.notes || "Sin notas adicionales."}
+    </div>
+  `;
+}
+
+function printQuote(){
+  saveCurrentQuote();
+  renderPrintDoc();
+  window.print();
+}
+
+function showTab(tab){
+  document.querySelectorAll(".screen").forEach(x => x.classList.add("hidden"));
+  $(`screen_${tab}`).classList.remove("hidden");
+  document.querySelectorAll(".nav-tabs button").forEach(x => x.classList.toggle("active", x.dataset.tab === tab));
+}
+
+function bindEvents(){
+  document.querySelectorAll("input,select,textarea").forEach(el => {
+    el.addEventListener("input", () => updateAll());
+    el.addEventListener("change", () => updateAll());
+  });
+  document.querySelectorAll(".nav-tabs button").forEach(btn => btn.addEventListener("click", () => showTab(btn.dataset.tab)));
+  $("saveQuote").addEventListener("click", () => { saveCurrentQuote(); toast("Cotización guardada en este celular."); });
+  $("copyBtn").addEventListener("click", copyMessage);
+  $("waBtn").addEventListener("click", () => { saveCurrentQuote(); openWhatsApp(); });
+  $("printBtn").addEventListener("click", printQuote);
+  $("resetBtn").addEventListener("click", () => {
+    if(confirm("¿Limpiar la cotización actual?")){
+      document.querySelector("form").reset();
+      Object.keys(App.cfg.materials).forEach(id => $(`mat_${id}`).value = 0);
+      App.state.selectedTier = "recommended";
+      updateAll();
+      toast("Formulario limpio.");
+    }
+  });
+  $("clearHistory").addEventListener("click", () => {
+    if(confirm("¿Borrar historial guardado en este celular?")){
+      localStorage.removeItem("aacc_quote_history_v1");
+      renderHistory();
+    }
+  });
+  $("equipment").addEventListener("change", () => {
+    $("equipmentManualBox").classList.toggle("hidden", $("equipment").value !== "otro_manual");
+    $("equipmentQty").value = $("equipment").value === "none" ? 0 : Math.max(1, safeNumber($("equipmentQty").value || 1));
+    updateAll();
+  });
+}
+
+async function init(){
+  $("today").textContent = new Date().toLocaleDateString("es-MX", {weekday:"long", year:"numeric", month:"long", day:"numeric"});
+  await loadConfig();
+  renderSelectors();
+  bindEvents();
+  updateAll();
+}
+document.addEventListener("DOMContentLoaded", init);
+
+</script>
+</body>
+</html>
